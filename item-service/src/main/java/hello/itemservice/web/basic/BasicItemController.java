@@ -5,9 +5,7 @@ import hello.itemservice.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -30,6 +28,41 @@ public class BasicItemController {
     public String item(@PathVariable long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
+        return "basic/item";
+    }
+
+    @GetMapping("/add")
+    public String addForm() {
+        return "basic/addForm";
+    }
+
+//    @PostMapping("/add")
+    public String addItemV1(@RequestParam String itemName,
+                       @RequestParam int price,
+                       @RequestParam int quantity,
+                       Model model) {
+        Item item = new Item(itemName, price, quantity);
+        itemRepository.save(item);
+        model.addAttribute("item", item);
+        return "basic/item";
+    }
+
+    /**
+     * modelAttribute 가 item 객체를 만들어주고 요청 파라미터 값을 입력해준다
+     * 추가로 모델에 "item" 이름으로 지정한 객체를 자동으로 넣어준다
+     */
+    // @PostMapping("/add")
+    public String addItemV2(@ModelAttribute("item") Item item,
+                            Model model) {
+        itemRepository.save(item);
+        model.addAttribute("item", item);
+        return "basic/item";
+    }
+
+    // 이렇게 써도 되긴 함..!!
+    @PostMapping("/add")
+    public String addItemV3(Item item) {
+        itemRepository.save(item);
         return "basic/item";
     }
 
